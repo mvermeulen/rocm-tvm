@@ -48,3 +48,4 @@ echo "RUN cd /src/tvm/build && cmake .. && make" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/topi/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/nnvm/python && python3 setup.py install" >> ${DOCKERFILE}
+echo "RUN pip3 install scipy psutil xgboost tornado" >> ${DOCKERFILE}
