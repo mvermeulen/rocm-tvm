@@ -36,7 +36,7 @@ read -p "Copy LLVM to docker? [Y]: " copy_llvm
 copy_llvm=${copy_llvm:="Y"}
 if [ "${copy_llvm}" == 'Y' -o "${copy_llvm}" == 'y' ]; then
     env LLVMBUILD="llvmbuild" ./build_llvm.sh
-    echo "COPY llvmbuild/install/* /usr/local/llvm/" >> ${DOCKERFILE}
+    echo "COPY llvmbuild/install/ /usr/local/llvm/" >> ${DOCKERFILE}
 else
    echo "RUN cd /src && git clone https://github.com/llvm/llvm-project.git" >> ${DOCKERFILE}
    echo "RUN cd /src/llvm-project && mkdir build" >> ${DOCKERFILE}
