@@ -29,14 +29,20 @@ echo "RUN apt update && apt install -y git cmake libz3-dev libxml2-dev" >> ${DOC
 echo "RUN apt update && apt install -y rocm-libs miopen-hip" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip" >> ${DOCKERFILE}
 
+echo "RUN mkdir /src" >> ${DOCKERFILE}
 # AMDGPU version of LLVM including lld.ld is required to run TVM.
 # Seems to be some issues with prebuilt packages, so build from source.
-echo "RUN mkdir /src" >> ${DOCKERFILE}
-echo "RUN cd /src && git clone https://github.com/llvm/llvm-project.git" >> ${DOCKERFILE}
-echo "RUN cd /src/llvm-project && mkdir build" >> ${DOCKERFILE}
-echo "RUN cd /src/llvm-project/build && cmake -G \"Unix Makefiles\" -DLLVM_ENABLE_PROJECTS=\"lld;compiler-rt;clang\" -DLLVM_TARGETS_TO_BUILD=\"X86;AMDGPU\" -DCMAKE_INSTALL_PREFIX=/usr/local/llvm ../llvm" >> ${DOCKERFILE}
-echo "RUN cd /src/llvm-project/build && make 2>&1 | tee make.log && make install" >> ${DOCKERFILE}
-
+read -p "Copy LLVM to docker? [Y]: " copy_llvm
+copy_llvm=${copy_llvm:="Y"}
+if [ "${copy_llvm}" == 'Y' -o "${copy_llvm}" == 'y' ]; then
+    env LLVMBUILD="llvmbuild" ./build_llvm.sh
+    echo "COPY llvmbuild/install/* /usr/local/llvm/" >> ${DOCKERFILE}
+else
+   echo "RUN cd /src && git clone https://github.com/llvm/llvm-project.git" >> ${DOCKERFILE}
+   echo "RUN cd /src/llvm-project && mkdir build" >> ${DOCKERFILE}
+   echo "RUN cd /src/llvm-project/build && cmake -G \"Unix Makefiles\" -DLLVM_ENABLE_PROJECTS=\"lld;compiler-rt;clang\" -DLLVM_TARGETS_TO_BUILD=\"X86;AMDGPU\" -DCMAKE_INSTALL_PREFIX=/usr/local/llvm ../llvm" >> ${DOCKERFILE}
+   echo "RUN cd /src/llvm-project/build && make 2>&1 | tee make.log && make install" >> ${DOCKERFILE}
+fi
 # Build TVM
 echo "RUN cd /src && git clone --recursive https://github.com/dmlc/tvm" >> ${DOCKERFILE}
 
