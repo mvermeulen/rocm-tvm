@@ -47,7 +47,7 @@ fi
 echo "RUN cd /src && git clone --recursive https://github.com/dmlc/tvm" >> ${DOCKERFILE}
 
 # Patch source files mentioned here: https://github.com/dmlc/tvm/issues/3058
-echo "RUN cd /src/tvm/src/codegen/llvm && sed -e 's/DetectROCMComputeVersion(target)/DetectROCMComputeVersion(target) << \" -mattr=-code-object-v3 \"/g' codegen_amdgpu.cc > codegen_amdgpu.cc.new && mv codegen_amdgpu.cc codegen_amdgpu.cc.old && mv codegen_amdgpu.cc.new codegen_amdgpu.cc" >> ${DOCKERFILE}
+#echo "RUN cd /src/tvm/src/codegen/llvm && sed -e 's/DetectROCMComputeVersion(target)/DetectROCMComputeVersion(target) << \" -mattr=-code-object-v3 \"/g' codegen_amdgpu.cc > codegen_amdgpu.cc.new && mv codegen_amdgpu.cc codegen_amdgpu.cc.old && mv codegen_amdgpu.cc.new codegen_amdgpu.cc" >> ${DOCKERFILE}
 echo "RUN mkdir /src/tvm/build" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /usr/local/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/build && cmake .. && make" >> ${DOCKERFILE}
