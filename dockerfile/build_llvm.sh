@@ -7,8 +7,8 @@ LLVMBUILD=${LLVMBUILD:="llvmbuild"}
 LLVMINSTALL=${LLVMINSTALL:="${LLVMBUILD}/install"}
 LLVMSRC=${LLVSRC:="${LLVMBUILD}/llvm-project"}
 
-if [ -d ${LLVMBUILD}/install ]; then
-    echo ${LLVMBUILD}/install already built
+if [ -d ${LLVMINSTALL} ]; then
+    echo ${LLVMINSTALL} already built
     exit 0
 fi
 
