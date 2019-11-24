@@ -113,7 +113,7 @@ bx, tx = s[C].split(C.op.axis[0], factor=64)
 # compute grid. These are GPU specific constructs that allow us
 # to generate code that runs on GPU.
 #
-if tgt == "rocm" or tgt.startswith('opencl'):
+if tgt == "cuda" or tgt == "rocm" or tgt.startswith('opencl'):
   s[C].bind(bx, tvm.thread_axis("blockIdx.x"))
   s[C].bind(tx, tvm.thread_axis("threadIdx.x"))
 
@@ -151,7 +151,7 @@ fadd = tvm.build(s, [A, B, C], tgt, target_host=tgt_host, name="myadd")
 # - asnumpy() copies the GPU array back to the CPU and we can use this to verify correctness
 #
 ctx = tvm.context(tgt, 0)
-#ctx = tvm.rocm()
+ctx = tvm.rocm()
 
 n = 1024
 a = tvm.nd.array(np.random.uniform(size=n).astype(A.dtype), ctx)
@@ -169,7 +169,7 @@ tvm.testing.assert_allclose(c.asnumpy(), a.asnumpy() + b.asnumpy())
 #
 # The following code fetches the device module and prints the content code.
 #
-if tgt == "cuda" or tgt.startswith('opencl'):
+if tgt == "cuda" or tgt == "rocm" or tgt.startswith('opencl'):
     dev_module = fadd.imported_modules[0]
     print("-----GPU code-----")
     print(dev_module.get_source())
@@ -211,8 +211,10 @@ from tvm.contrib import util
 
 temp = util.tempdir()
 fadd.save(temp.relpath("myadd.o"))
-if tgt == "rocm":
+if tgt == "cuda":
     fadd.imported_modules[0].save(temp.relpath("myadd.ptx"))
+if tgt == "rocm":
+    fadd.imported_modules[0].save(temp.relpath("myadd.hsaco"))
 if tgt.startswith('opencl'):
     fadd.imported_modules[0].save(temp.relpath("myadd.cl"))
 cc.create_shared(temp.relpath("myadd.so"), [temp.relpath("myadd.o")])
@@ -235,8 +237,12 @@ print(temp.listdir())
 # re-links them together. We can verify that the newly loaded function works.
 #
 fadd1 = tvm.module.load(temp.relpath("myadd.so"))
-if tgt == "rocm":
+if tgt == "cuda":
     fadd1_dev = tvm.module.load(temp.relpath("myadd.ptx"))
+    fadd1.import_module(fadd1_dev)
+
+if tgt == "rocm":
+    fadd1_dev = tvm.module.load(temp.relpath("myadd.hsaco"))
     fadd1.import_module(fadd1_dev)
 
 if tgt.startswith('opencl'):
