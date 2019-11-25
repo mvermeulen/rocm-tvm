@@ -64,7 +64,7 @@ if __name__ == "__main__":
                              "the choices list, pick the most similar one as argument.")
     parser.add_argument("--repeat", type=int, default=600)
     parser.add_argument("--target", type=str,
-                        choices=['cuda', 'opencl', 'rocm', 'nvptx', 'metal'], default='cuda',
+                        choices=['cuda', 'opencl', 'rocm', 'nvptx', 'metal'], default='rocm',
                         help="The tvm compilation target")
     parser.add_argument("--thread", type=int, default=1, help="The number of threads to be run.")
     args = parser.parse_args()
