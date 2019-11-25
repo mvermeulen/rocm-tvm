@@ -99,7 +99,9 @@ def conv2d_no_batching(N, H, W, CO, CI, KH, KW, stride, padding):
     cfg.define_split("tile_ry", ry, num_outputs=3)
     cfg.define_split("tile_rx", rx, num_outputs=3)
     cfg.define_knob("auto_unroll_max_step", [0, 512, 1500])
-    cfg.define_knob("unroll_explicit", [0, 1])
+
+    # not supported by LLVM-based backends
+    # cfg.define_knob("unroll_explicit", [0, 1])
     ##### space definition end #####
 
     # inline padding
@@ -161,7 +163,8 @@ def conv2d_no_batching(N, H, W, CO, CI, KH, KW, stride, padding):
 
     # tune unroll
     s[output].pragma(kernel_scope, 'auto_unroll_max_step', cfg['auto_unroll_max_step'].val)
-    s[output].pragma(kernel_scope, 'unroll_explicit', cfg['unroll_explicit'].val)
+    # see above
+    # s[output].pragma(kernel_scope, 'unroll_explicit', cfg['unroll_explicit'].val)
 
     return s, [raw_data, kernel, conv]
 
