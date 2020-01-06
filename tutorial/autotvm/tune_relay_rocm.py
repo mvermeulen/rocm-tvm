@@ -15,15 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 """
-Auto-tuning a convolutional network for NVIDIA GPU
-==================================================
+Auto-tuning a convolutional network for AMD GPU
+===============================================
 **Author**: `Lianmin Zheng <https://github.com/merrymercy>`_, `Eddie Yan <https://github.com/eqy/>`_
 
 Auto-tuning for specific devices and workloads is critical for getting the
 best performance. This is a tutorial on how to tune a whole convolutional
-network for NVIDIA GPU.
+network for AMD GPU.
 
-The operator implementation for NVIDIA GPU in TVM is written in template form.
+The operator implementation for AMD GPU in TVM is written in template form.
 The template has many tunable knobs (tile factor, unrolling, etc).
 We will tune all convolution and depthwise convolution operators
 in the neural network. After tuning, we produce a log file which stores
@@ -31,7 +31,7 @@ the best knob values for all required operators. When the TVM compiler compiles
 these operators, it will query this log file to get the best knob values.
 
 We also released pre-tuned parameters for some NVIDIA GPUs. You can go to
-`NVIDIA GPU Benchmark <https://github.com/dmlc/tvm/wiki/Benchmark#nvidia-gpu>`_
+`NVIDIA GPU Benchmark <https://github.com/apache/incubator-tvm/wiki/Benchmark#nvidia-gpu>`_
 to see the results.
 """
 
@@ -71,7 +71,7 @@ import tvm.contrib.graph_runtime as runtime
 # Define Network
 # --------------
 # First we need to define the network in relay frontend API.
-# We can load some pre-defined network from :code:`nnvm.testing`.
+# We can load some pre-defined network from :code:`tvm.relay.testing`.
 # We can also load models from MXNet, ONNX and TensorFlow.
 
 def get_network(name, batch_size):
@@ -81,28 +81,29 @@ def get_network(name, batch_size):
 
     if "resnet" in name:
         n_layer = int(name.split('-')[1])
-        net, params = relay.testing.resnet.get_workload(num_layers=n_layer, batch_size=batch_size, dtype=dtype)
+        mod, params = relay.testing.resnet.get_workload(num_layers=n_layer, batch_size=batch_size, dtype=dtype)
     elif "vgg" in name:
         n_layer = int(name.split('-')[1])
-        net, params = relay.testing.vgg.get_workload(num_layers=n_layer, batch_size=batch_size, dtype=dtype)
+        mod, params = relay.testing.vgg.get_workload(num_layers=n_layer, batch_size=batch_size, dtype=dtype)
     elif name == 'mobilenet':
-        net, params = relay.testing.mobilenet.get_workload(batch_size=batch_size, dtype=dtype)
+        mod, params = relay.testing.mobilenet.get_workload(batch_size=batch_size, dtype=dtype)
     elif name == 'squeezenet_v1.1':
-        net, params = relay.testing.squeezenet.get_workload(batch_size=batch_size, version='1.1', dtype=dtype)
+        mod, params = relay.testing.squeezenet.get_workload(batch_size=batch_size, version='1.1', dtype=dtype)
     elif name == 'inception_v3':
         input_shape = (1, 3, 299, 299)
-        net, params = relay.testing.inception_v3.get_workload(batch_size=batch_size, dtype=dtype)
+        mod, params = relay.testing.inception_v3.get_workload(batch_size=batch_size, dtype=dtype)
     elif name == 'mxnet':
         # an example for mxnet model
         from mxnet.gluon.model_zoo.vision import get_model
         block = get_model('resnet18_v1', pretrained=True)
         mod, params = relay.frontend.from_mxnet(block, shape={'data': input_shape}, dtype=dtype)
-        net = mod[mod.entry_func]
+        net = mod["main"]
         net = relay.Function(net.params, relay.nn.softmax(net.body), None, net.type_params, net.attrs)
+        mod = relay.Module.from_expr(net)
     else:
         raise ValueError("Unsupported network: " + name)
 
-    return net, params, input_shape, output_shape
+    return mod, params, input_shape, output_shape
 
 ###########################################
 # Set Tuning Options
@@ -200,7 +201,8 @@ def tune_tasks(tasks,
                 tuner_obj.load_history(autotvm.record.load_from_file(tmp_log_file))
 
         # do tuning
-        tuner_obj.tune(n_trial=min(n_trial, len(tsk.config_space)),
+        n_trial = min(n_trial, len(tsk.config_space))
+        tuner_obj.tune(n_trial=n_trial,
                        early_stopping=early_stopping,
                        measure_option=measure_option,
                        callbacks=[
@@ -218,9 +220,9 @@ def tune_tasks(tasks,
 def tune_and_evaluate(tuning_opt):
     # extract workloads from relay program
     print("Extract tasks...")
-    net, params, input_shape, out_shape = get_network(network, batch_size=1)
-    tasks = autotvm.task.extract_from_program(net, target=target,
-                                            params=params, ops=(relay.op.nn.conv2d,))
+    mod, params, input_shape, out_shape = get_network(network, batch_size=1)
+    tasks = autotvm.task.extract_from_program(mod["main"], target=target,
+                                              params=params, ops=(relay.op.nn.conv2d,))
 
     # run tuning tasks
     print("Tuning...")
@@ -231,7 +233,7 @@ def tune_and_evaluate(tuning_opt):
         print("Compile...")
         with relay.build_config(opt_level=3):
             graph, lib, params = relay.build_module.build(
-                net, target=target, params=params)
+                mod, target=target, params=params)
 
         # export library
         tmp = tempdir()
@@ -255,7 +257,7 @@ def tune_and_evaluate(tuning_opt):
 # We do not run the tuning in our webpage server since it takes too long.
 # Uncomment the following line to run it by yourself.
 
-# tune_and_evaluate(tuning_option)
+tune_and_evaluate(tuning_option)
 
 ######################################################################
 # Sample Output
