@@ -222,7 +222,7 @@ def tune_and_evaluate(tuning_opt):
     print("Extract tasks...")
     mod, params, input_shape, out_shape = get_network(network, batch_size=1)
     tasks = autotvm.task.extract_from_program(mod["main"], target=target,
-                                              params=params, ops=(relay.op.nn.conv2d,))
+                                              params=params, ops=(relay.op.nn.conv2d,relay.op.nn.dense))
 
     # run tuning tasks
     print("Tuning...")
