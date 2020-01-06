@@ -127,11 +127,11 @@ tuning_option = {
 
     'measure_option': autotvm.measure_option(
         builder=autotvm.LocalBuilder(timeout=10),
-        #runner=autotvm.LocalRunner(number=20, repeat=3, timeout=4, min_repeat_ms=150),
-        runner=autotvm.RPCRunner(
-            '1080ti',  # change the device key to your key
-            '0.0.0.0', 9190,
-            number=20, repeat=3, timeout=4, min_repeat_ms=150)
+        runner=autotvm.LocalRunner(number=20, repeat=3, timeout=4, min_repeat_ms=150),
+#        runner=autotvm.RPCRunner(
+#            '1080ti',  # change the device key to your key
+#            '0.0.0.0', 9190,
+#            number=20, repeat=3, timeout=4, min_repeat_ms=150)
     ),
 }
 
@@ -222,7 +222,7 @@ def tune_and_evaluate(tuning_opt):
     print("Extract tasks...")
     mod, params, input_shape, out_shape = get_network(network, batch_size=1)
     tasks = autotvm.task.extract_from_program(mod["main"], target=target,
-                                              params=params, ops=(relay.op.nn.conv2d,))
+                                              params=params, ops=(relay.op.nn.conv2d,relay.op.nn.dense))
 
     # run tuning tasks
     print("Tuning...")
@@ -370,18 +370,18 @@ tune_and_evaluate(tuning_option)
 # Finally, we need to change the tuning option to use RPCRunner. Use the code below
 # to replace the corresponding part above.
 
-tuning_option = {
-    'log_filename': log_file,
-
-    'tuner': 'xgb',
-    'n_trial': 2000,
-    'early_stopping': 600,
-
-    'measure_option': autotvm.measure_option(
-        builder=autotvm.LocalBuilder(timeout=10),
-        runner=autotvm.RPCRunner(
-            '1080ti',  # change the device key to your key
-            '0.0.0.0', 9190,
-            number=20, repeat=3, timeout=4, min_repeat_ms=150),
-    ),
-}
+#tuning_option = {
+#    'log_filename': log_file,
+#
+#    'tuner': 'xgb',
+#    'n_trial': 2000,
+#    'early_stopping': 600,
+#
+#    'measure_option': autotvm.measure_option(
+#        builder=autotvm.LocalBuilder(timeout=10),
+#        runner=autotvm.RPCRunner(
+#            '1080ti',  # change the device key to your key
+#            '0.0.0.0', 9190,
+#            number=20, repeat=3, timeout=4, min_repeat_ms=150),
+#    ),
+#}
