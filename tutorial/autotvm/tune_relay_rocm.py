@@ -15,15 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 """
-Auto-tuning a convolutional network for AMD GPU
-===============================================
+Auto-tuning a convolutional network for NVIDIA GPU
+==================================================
 **Author**: `Lianmin Zheng <https://github.com/merrymercy>`_, `Eddie Yan <https://github.com/eqy/>`_
 
 Auto-tuning for specific devices and workloads is critical for getting the
 best performance. This is a tutorial on how to tune a whole convolutional
-network for AMD GPU.
+network for NVIDIA GPU.
 
-The operator implementation for AMD GPU in TVM is written in template form.
+The operator implementation for NVIDIA GPU in TVM is written in template form.
 The template has many tunable knobs (tile factor, unrolling, etc).
 We will tune all convolution and depthwise convolution operators
 in the neural network. After tuning, we produce a log file which stores
@@ -127,11 +127,11 @@ tuning_option = {
 
     'measure_option': autotvm.measure_option(
         builder=autotvm.LocalBuilder(timeout=10),
-        runner=autotvm.LocalRunner(number=20, repeat=3, timeout=4, min_repeat_ms=150),
-#        runner=autotvm.RPCRunner(
-#            '1080ti',  # change the device key to your key
-#            '0.0.0.0', 9190,
-#            number=20, repeat=3, timeout=4, min_repeat_ms=150)
+        #runner=autotvm.LocalRunner(number=20, repeat=3, timeout=4, min_repeat_ms=150),
+        runner=autotvm.RPCRunner(
+            '1080ti',  # change the device key to your key
+            '0.0.0.0', 9190,
+            number=20, repeat=3, timeout=4, min_repeat_ms=150)
     ),
 }
 
@@ -222,7 +222,7 @@ def tune_and_evaluate(tuning_opt):
     print("Extract tasks...")
     mod, params, input_shape, out_shape = get_network(network, batch_size=1)
     tasks = autotvm.task.extract_from_program(mod["main"], target=target,
-                                              params=params, ops=(relay.op.nn.conv2d,relay.op.nn.dense))
+                                              params=params, ops=(relay.op.nn.conv2d,))
 
     # run tuning tasks
     print("Tuning...")
@@ -370,18 +370,18 @@ tune_and_evaluate(tuning_option)
 # Finally, we need to change the tuning option to use RPCRunner. Use the code below
 # to replace the corresponding part above.
 
-#tuning_option = {
-#    'log_filename': log_file,
-#
-#    'tuner': 'xgb',
-#    'n_trial': 2000,
-#    'early_stopping': 600,
-#
-#    'measure_option': autotvm.measure_option(
-#        builder=autotvm.LocalBuilder(timeout=10),
-#        runner=autotvm.RPCRunner(
-#            '1080ti',  # change the device key to your key
-#            '0.0.0.0', 9190,
-#            number=20, repeat=3, timeout=4, min_repeat_ms=150),
-#    ),
-#}
+tuning_option = {
+    'log_filename': log_file,
+
+    'tuner': 'xgb',
+    'n_trial': 2000,
+    'early_stopping': 600,
+
+    'measure_option': autotvm.measure_option(
+        builder=autotvm.LocalBuilder(timeout=10),
+        runner=autotvm.RPCRunner(
+            '1080ti',  # change the device key to your key
+            '0.0.0.0', 9190,
+            number=20, repeat=3, timeout=4, min_repeat_ms=150),
+    ),
+}
