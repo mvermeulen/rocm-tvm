@@ -52,6 +52,5 @@ echo "RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_L
 echo "RUN cd /src/tvm/build && cmake .. && make" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/topi/python && python3 setup.py install" >> ${DOCKERFILE}
-echo "RUN cd /src/tvm/nnvm/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm" >> ${DOCKERFILE}
 echo "RUN pip3 install scipy psutil xgboost tornado" >> ${DOCKERFILE}
