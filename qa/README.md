@@ -4,4 +4,4 @@ General testing procedure is to create or download a ROCm docker container with 
 under test (see ../dockerfile directory) and then run scripts from this directory.
 
 These tests include:
-   <to be added>
+   run_bench.sh - run one benchmark to make sure we get results
