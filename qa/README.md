@@ -5,3 +5,4 @@ under test (see ../dockerfile directory) and then run scripts from this director
 
 These tests include:
    run_bench.sh - run one benchmark to make sure we get results
+   run_quickstart.sh - run the overall quickstart example to make sure we get results.

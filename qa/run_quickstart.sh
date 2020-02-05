@@ -16,5 +16,5 @@
 TVM_HOME=${TVM_HOME:="/src/tvm"}
 ROCM_TVM_HOME=${ROCM_TVM_HOME:="/src/rocm-tvm"}
 
-cd ${ROCM_TVM_HOME}/tutorials
+cd ${ROCM_TVM_HOME}/tutorial
 python3 relay_quick_start.py
