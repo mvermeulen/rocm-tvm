@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Run tvm benchmarks to collect results
+# Run TVM benchmark with resnet-18 to collect results
 #
 # Expected output:
 #         --------------------------------------------------
