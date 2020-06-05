@@ -12,8 +12,8 @@ if [ -f ${DOCKERFILE} ]; then
 fi
 
 # The base package is dev-ubuntu-<version>:<rocm>, ask following questions to configure
-read -p "Enter ROCm version [2.9]: " rocm_version
-rocm_version=${rocm_version:="2.9"}
+read -p "Enter ROCm version [3.3]: " rocm_version
+rocm_version=${rocm_version:="3.3"}
 
 read -p "Enter Ubuntu version [18.04]: " ubuntu_version
 ubuntu_version=${ubuntu_version:="18.04"}
@@ -35,8 +35,8 @@ echo "RUN mkdir /src" >> ${DOCKERFILE}
 read -p "Copy LLVM to docker? [Y]: " copy_llvm
 copy_llvm=${copy_llvm:="Y"}
 if [ "${copy_llvm}" == 'Y' -o "${copy_llvm}" == 'y' ]; then
-    env LLVMBUILD="llvmbuild" ./build_llvm.sh
-    echo "COPY llvmbuild/install/ /usr/local/llvm/" >> ${DOCKERFILE}
+    env LLVMBUILD="llvmbuild9" ./build_llvm9.sh
+    echo "COPY llvmbuild9/install/ /usr/local/llvm/" >> ${DOCKERFILE}
 else
    echo "RUN cd /src && git clone https://github.com/llvm/llvm-project.git" >> ${DOCKERFILE}
    echo "RUN cd /src/llvm-project && mkdir build" >> ${DOCKERFILE}
@@ -53,4 +53,4 @@ echo "RUN cd /src/tvm/build && cmake .. && make" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/topi/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm" >> ${DOCKERFILE}
-echo "RUN pip3 install scipy psutil xgboost tornado" >> ${DOCKERFILE}
+echo "RUN pip3 install scipy psutil xgboost==1.0.2 tornado" >> ${DOCKERFILE}

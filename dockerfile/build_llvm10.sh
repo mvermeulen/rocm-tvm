@@ -2,7 +2,7 @@
 #
 # Build LLVM locally rather than in the docker image.
 
-LLVMBUILD=${LLVMBUILD:="llvmbuild"}
+LLVMBUILD=${LLVMBUILD:="llvmbuild10"}
 # needs to be local so it can be copied in...
 LLVMINSTALL=${LLVMINSTALL:="${LLVMBUILD}/install"}
 LLVMSRC=${LLVSRC:="${LLVMBUILD}/llvm-project"}
@@ -23,7 +23,7 @@ else
     cd ${LLVMBUILD}
     git clone https://github.com/llvm/llvm-project.git
     cd llvm-project
-    git checkout llvmorg-9.0.0
+    git checkout llvmorg-10.0.0
 fi
 
 if [ ! -d build ]; then
