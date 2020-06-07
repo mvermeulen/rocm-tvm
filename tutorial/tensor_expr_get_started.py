@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 """
+.. _tutorial-tensor-expr-get-started:
+
 Get Started with Tensor Expression
 ==================================
 **Author**: `Tianqi Chen <https://tqchen.github.io>`_
@@ -28,12 +30,13 @@ the tensor expression language.
 from __future__ import absolute_import, print_function
 
 import tvm
+from tvm import te
 import numpy as np
 
 # Global declarations of environment.
 
 tgt_host="llvm"
-# Change it to respective GPU if gpu is enabled Ex: rocm, opencl
+# Change it to respective GPU if gpu is enabled Ex: cuda, opencl, rocm
 tgt="rocm"
 
 ######################################################################
@@ -62,10 +65,10 @@ tgt="rocm"
 # No computation happens during this phase, as we are only declaring how
 # the computation should be done.
 #
-n = tvm.var("n")
-A = tvm.placeholder((n,), name='A')
-B = tvm.placeholder((n,), name='B')
-C = tvm.compute(A.shape, lambda i: A[i] + B[i], name="C")
+n = te.var("n")
+A = te.placeholder((n,), name='A')
+B = te.placeholder((n,), name='B')
+C = te.compute(A.shape, lambda i: A[i] + B[i], name="C")
 print(type(C))
 
 ######################################################################
@@ -88,7 +91,7 @@ print(type(C))
 #     C[i] = A[i] + B[i];
 #   }
 #
-s = tvm.create_schedule(C.op)
+s = te.create_schedule(C.op)
 
 ######################################################################
 # We used the split construct to split the first axis of C,
@@ -114,8 +117,8 @@ bx, tx = s[C].split(C.op.axis[0], factor=64)
 # to generate code that runs on GPU.
 #
 if tgt == "cuda" or tgt == "rocm" or tgt.startswith('opencl'):
-  s[C].bind(bx, tvm.thread_axis("blockIdx.x"))
-  s[C].bind(tx, tvm.thread_axis("threadIdx.x"))
+  s[C].bind(bx, te.thread_axis("blockIdx.x"))
+  s[C].bind(tx, te.thread_axis("threadIdx.x"))
 
 ######################################################################
 # Compilation
@@ -151,7 +154,6 @@ fadd = tvm.build(s, [A, B, C], tgt, target_host=tgt_host, name="myadd")
 # - asnumpy() copies the GPU array back to the CPU and we can use this to verify correctness
 #
 ctx = tvm.context(tgt, 0)
-ctx = tvm.rocm()
 
 n = 1024
 a = tvm.nd.array(np.random.uniform(size=n).astype(A.dtype), ctx)
@@ -189,7 +191,7 @@ else:
 #   arrays with different shapes into fadd, an error will be raised.
 #
 #   We can do more specializations. For example, we can write
-#   :code:`n = tvm.convert(1024)` instead of :code:`n = tvm.var("n")`,
+#   :code:`n = tvm.runtime.convert(1024)` instead of :code:`n = te.var("n")`,
 #   in the computation declaration. The generated function will
 #   only take vectors with length 1024.
 #
@@ -236,17 +238,17 @@ print(temp.listdir())
 # The following code loads the host and device module separately and
 # re-links them together. We can verify that the newly loaded function works.
 #
-fadd1 = tvm.module.load(temp.relpath("myadd.so"))
+fadd1 = tvm.runtime.load_module(temp.relpath("myadd.so"))
 if tgt == "cuda":
-    fadd1_dev = tvm.module.load(temp.relpath("myadd.ptx"))
+    fadd1_dev = tvm.runtime.load_module(temp.relpath("myadd.ptx"))
     fadd1.import_module(fadd1_dev)
 
 if tgt == "rocm":
-    fadd1_dev = tvm.module.load(temp.relpath("myadd.hsaco"))
+    fadd1_dev = tvm.runtime.load_module(temp.relpath("myadd.hsaco"))
     fadd1.import_module(fadd1_dev)
 
 if tgt.startswith('opencl'):
-    fadd1_dev = tvm.module.load(temp.relpath("myadd.cl"))
+    fadd1_dev = tvm.runtime.load_module(temp.relpath("myadd.cl"))
     fadd1.import_module(fadd1_dev)
 
 fadd1(a, b, c)
@@ -262,7 +264,7 @@ tvm.testing.assert_allclose(c.asnumpy(), a.asnumpy() + b.asnumpy())
 # Currently we support packing of Metal, OpenCL and CUDA modules.
 #
 fadd.export_library(temp.relpath("myadd_pack.so"))
-fadd2 = tvm.module.load(temp.relpath("myadd_pack.so"))
+fadd2 = tvm.runtime.load_module(temp.relpath("myadd_pack.so"))
 fadd2(a, b, c)
 tvm.testing.assert_allclose(c.asnumpy(), a.asnumpy() + b.asnumpy())
 
