@@ -57,4 +57,4 @@ echo "RUN cd /src/tvm/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm" >> ${DOCKERFILE}
 echo "RUN pip3 install scipy psutil xgboost tornado" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils" >> ${DOCKERFILE}
-echo "RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz pciutils" >> ${DOCKERFILE}
+echo "RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz" >> ${DOCKERFILE}
