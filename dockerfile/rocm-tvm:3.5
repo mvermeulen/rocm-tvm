@@ -10,12 +10,14 @@ RUN mkdir /src
 # newer cmake needed by xgboost
 RUN cd /src && wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && tar xf cmake-3.17.3.tar.gz && cd cmake-3.17.3 && ./configure && make && make install
 COPY llvmbuild9/install/ /usr/local/llvm/
-RUN cd /src && git clone --recursive https://github.com/dmlc/tvm && cd tvm && git checkout 6e1cd8256
+RUN cd /src && git clone --recursive https://github.com/dmlc/tvm && cd tvm
 RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc
 RUN mkdir /src/tvm/build
 RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /usr/local/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
 RUN cd /src/tvm/build && cmake .. && make
 RUN cd /src/tvm/python && python3 setup.py install
-RUN cd /src/tvm/topi/python && python3 setup.py install
+#RUN cd /src/tvm/topi/python && python3 setup.py install
 RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
 RUN pip3 install scipy psutil xgboost tornado
+RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev graphviz pciutils
+RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz

@@ -46,12 +46,15 @@ else
 fi
 # Build TVM
 echo "RUN cd /src && git clone --recursive https://github.com/dmlc/tvm" >> ${DOCKERFILE}
+echo "RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc >> ${DOCKERFILE}
 
 # Patch source files mentioned here: https://github.com/dmlc/tvm/issues/3058
 echo "RUN mkdir /src/tvm/build" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /usr/local/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/build && cmake .. && make" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/python && python3 setup.py install" >> ${DOCKERFILE}
-echo "RUN cd /src/tvm/topi/python && python3 setup.py install" >> ${DOCKERFILE}
+#echo "RUN cd /src/tvm/topi/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm" >> ${DOCKERFILE}
 echo "RUN pip3 install scipy psutil xgboost tornado" >> ${DOCKERFILE}
+echo "RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils" >> ${DOCKERFILE}
+echo "RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz pciutils" >> ${DOCKERFILE}
