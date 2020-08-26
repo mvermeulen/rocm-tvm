@@ -30,7 +30,6 @@ echo "RUN mkdir /src && cd /src && wget https://github.com/Kitware/CMake/release
 echo "RUN apt update && apt install -y rocm-libs miopen-hip" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip" >> ${DOCKERFILE}
 
-echo "RUN mkdir /src" >> ${DOCKERFILE}
 # AMDGPU version of LLVM including lld.ld is required to run TVM.
 # Seems to be some issues with prebuilt packages, so build from source.
 read -p "Copy LLVM to docker? [Y]: " copy_llvm
