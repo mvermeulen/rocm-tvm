@@ -12,8 +12,8 @@ if [ -f ${DOCKERFILE} ]; then
 fi
 
 # The base package is dev-ubuntu-<version>:<rocm>, ask following questions to configure
-read -p "Enter ROCm version [3.3]: " rocm_version
-rocm_version=${rocm_version:="3.3"}
+read -p "Enter ROCm version [3.7]: " rocm_version
+rocm_version=${rocm_version:="3.7"}
 
 read -p "Enter Ubuntu version [18.04]: " ubuntu_version
 ubuntu_version=${ubuntu_version:="18.04"}
@@ -46,7 +46,7 @@ else
 fi
 # Build TVM
 echo "RUN cd /src && git clone --recursive https://github.com/dmlc/tvm" >> ${DOCKERFILE}
-echo "RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc >> ${DOCKERFILE}
+echo "RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc" >> ${DOCKERFILE}
 
 # Patch source files mentioned here: https://github.com/dmlc/tvm/issues/3058
 echo "RUN mkdir /src/tvm/build" >> ${DOCKERFILE}
