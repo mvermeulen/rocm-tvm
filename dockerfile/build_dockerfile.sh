@@ -45,8 +45,8 @@ else
 fi
 # Build TVM
 echo "RUN cd /src && git clone --recursive https://github.com/dmlc/tvm" >> ${DOCKERFILE}
-echo "RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc" >> ${DOCKERFILE}
-echo "RUN sed -i 's/hip_hcc/amdhip64/g' /src/tvm/cmake/util/FindROCM.cmake" >> ${DOCKERFILE}
+echo "#RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc" >> ${DOCKERFILE}
+echo "#RUN sed -i 's/hip_hcc/amdhip64/g' /src/tvm/cmake/util/FindROCM.cmake" >> ${DOCKERFILE}
 
 # Patch source files mentioned here: https://github.com/dmlc/tvm/issues/3058
 echo "RUN mkdir /src/tvm/build" >> ${DOCKERFILE}

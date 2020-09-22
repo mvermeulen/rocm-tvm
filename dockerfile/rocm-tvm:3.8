@@ -1,0 +1,21 @@
+FROM rocm/dev-ubuntu-18.04:3.8
+RUN sed -e 's/debian/3.8/g' /etc/apt/sources.list.d/rocm.list > /etc/apt/sources.list.d/rocm3.8.list
+RUN rm /etc/apt/sources.list.d/rocm.list
+ENV PATH=/usr/local/llvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-dev
+RUN mkdir /src && cd /src && wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && tar xf cmake-3.17.3.tar.gz && cd cmake-3.17.3 && ./configure && make && make install
+RUN apt update && apt install -y rocm-libs miopen-hip
+RUN apt update && apt install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip
+COPY llvmbuild9/install/ /usr/local/llvm/
+RUN cd /src && git clone --recursive https://github.com/dmlc/tvm
+#RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc
+#RUN sed -i 's/hip_hcc/amdhip64/g' /src/tvm/cmake/util/FindROCM.cmake
+RUN mkdir /src/tvm/build
+RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /usr/local/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
+RUN cd /src/tvm/build && cmake .. && make
+RUN cd /src/tvm/python && python3 setup.py install
+RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
+RUN pip3 install scipy psutil xgboost tornado
+RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils
+RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz
