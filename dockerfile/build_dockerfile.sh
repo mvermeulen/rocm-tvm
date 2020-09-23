@@ -45,8 +45,6 @@ else
 fi
 # Build TVM
 echo "RUN cd /src && git clone --recursive https://github.com/dmlc/tvm" >> ${DOCKERFILE}
-echo "#RUN sed -i 's/-mattr=-code-object-v3//g' /src/tvm/src/target/llvm/codegen_amdgpu.cc" >> ${DOCKERFILE}
-echo "#RUN sed -i 's/hip_hcc/amdhip64/g' /src/tvm/cmake/util/FindROCM.cmake" >> ${DOCKERFILE}
 
 # Patch source files mentioned here: https://github.com/dmlc/tvm/issues/3058
 echo "RUN mkdir /src/tvm/build" >> ${DOCKERFILE}
@@ -55,6 +53,6 @@ echo "RUN cd /src/tvm/build && cmake .. && make" >> ${DOCKERFILE}
 echo "RUN cd /src/tvm/python && python3 setup.py install" >> ${DOCKERFILE}
 #echo "RUN cd /src/tvm/topi/python && python3 setup.py install" >> ${DOCKERFILE}
 echo "RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm" >> ${DOCKERFILE}
-echo "RUN pip3 install scipy psutil xgboost tornado" >> ${DOCKERFILE}
+echo "RUN pip3 install scipy psutil xgboost tornado pytest" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils" >> ${DOCKERFILE}
 echo "RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz" >> ${DOCKERFILE}
