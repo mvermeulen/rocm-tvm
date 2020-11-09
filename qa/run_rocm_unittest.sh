@@ -18,4 +18,3 @@ python3 test_target_target.py
 python3 test_runtime_ndarray.py
 # expected output: "Running on target: rocm", along with no errors
 python3 test_te_tensor_overload.py
-python3 test_tir_transform_lower_warp_memory.py
