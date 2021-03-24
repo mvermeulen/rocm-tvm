@@ -7,7 +7,7 @@ RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-d
 RUN mkdir /src && cd /src && wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && tar xf cmake-3.17.3.tar.gz && cd cmake-3.17.3 && ./configure && make && make install
 RUN apt update && apt install -y rocm-libs miopen-hip
 RUN apt update && apt install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip
-COPY llvmbuild9/install/ /usr/local/llvm/
+COPY llvmbuild10/install/ /usr/local/llvm/
 RUN cd /src && git clone --recursive https://github.com/dmlc/tvm
 RUN mkdir /src/tvm/build
 RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /usr/local/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
