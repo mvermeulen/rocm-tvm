@@ -23,7 +23,7 @@ else
     cd ${LLVMBUILD}
     git clone https://github.com/llvm/llvm-project.git
     cd llvm-project
-    git checkout llvmorg-9.0.0
+    git checkout llvmorg-9.0.1
 fi
 
 if [ ! -d build ]; then
