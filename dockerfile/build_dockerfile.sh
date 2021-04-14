@@ -26,6 +26,7 @@ echo "RUN rm /etc/apt/sources.list.d/rocm.list" >> ${DOCKERFILE}
 echo "ENV PATH=/usr/local/llvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ${DOCKERFILE}
 echo "ENV DEBIAN_FRONTEND=noninteractive" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-dev" >> ${DOCKERFILE}
+echo "RUN apt install -y python3.8 && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1" >> ${DOCKERFILE}
 echo "RUN mkdir /src && cd /src && wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && tar xf cmake-3.17.3.tar.gz && cd cmake-3.17.3 && ./configure && make && make install" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y rocm-libs miopen-hip" >> ${DOCKERFILE}
 echo "RUN apt update && apt install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip" >> ${DOCKERFILE}
