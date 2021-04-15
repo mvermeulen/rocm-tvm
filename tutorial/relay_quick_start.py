@@ -31,7 +31,7 @@ Notice that you need to build TVM with rocm and llvm enabled.
 # ----------------------------------------------
 # The image below shows hardware backend currently supported by TVM:
 #
-# .. image:: https://github.com/dmlc/web-data/raw/master/tvm/tutorial/tvm_support_list.png
+# .. image:: https://github.com/dmlc/web-data/raw/main/tvm/tutorial/tvm_support_list.png
 #      :align: center
 #
 # In this tutorial, we'll choose rocm and llvm as target backends.
@@ -43,7 +43,8 @@ from tvm import relay
 from tvm.relay import testing
 import tvm
 from tvm import te
-from tvm.contrib import graph_runtime
+from tvm.contrib import graph_executor
+import tvm.testing
 
 ######################################################################
 # Define Neural Network in Relay
@@ -66,7 +67,8 @@ data_shape = (batch_size,) + image_shape
 out_shape = (batch_size, num_class)
 
 mod, params = relay.testing.resnet.get_workload(
-    num_layers=18, batch_size=batch_size, image_shape=image_shape)
+    num_layers=18, batch_size=batch_size, image_shape=image_shape
+)
 
 # set show_meta_data=True if you want to show meta data
 print(mod.astext(show_meta_data=False))
@@ -91,27 +93,27 @@ print(mod.astext(show_meta_data=False))
 # then registers the operators (i.e. the nodes of the optimized graphs) to
 # TVM implementations to generate a `tvm.module`.
 # To generate the module library, TVM will first transfer the high level IR
-# into the lower intrinsic IR of the specified target backend, which is CUDA
+# into the lower intrinsic IR of the specified target backend, which is ROCM
 # in this example. Then the machine code will be generated as the module library.
 
 opt_level = 3
 target = tvm.target.rocm()
 with tvm.transform.PassContext(opt_level=opt_level):
-    graph, lib, params = relay.build(mod, target, params=params)
+    lib = relay.build(mod, target, params=params)
 
 #####################################################################
 # Run the generate library
 # ------------------------
-# Now we can create graph runtime and run the module on Nvidia GPU.
+# Now we can create graph executor and run the module on Nvidia GPU.
 
 # create random input
-ctx = tvm.context("rocm",0)
+dev = tvm.device("rocm",0)
+#dev = tvm.gpu()
 data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
 # create module
-module = graph_runtime.create(graph, lib, ctx)
+module = graph_executor.GraphModule(lib["default"](dev))
 # set input and parameters
 module.set_input("data", data)
-module.set_input(**params)
 # run
 module.run()
 # get output
@@ -129,27 +131,20 @@ print(out.flatten()[0:10])
 ####################################################
 
 # save the graph, lib and params into separate files
-from tvm.contrib import util
+from tvm.contrib import utils
 
-temp = util.tempdir()
+temp = utils.tempdir()
 path_lib = temp.relpath("deploy_lib.tar")
 lib.export_library(path_lib)
-with open(temp.relpath("deploy_graph.json"), "w") as fo:
-    fo.write(graph)
-with open(temp.relpath("deploy_param.params"), "wb") as fo:
-    fo.write(relay.save_param_dict(params))
 print(temp.listdir())
 
 ####################################################
 
 # load the module back.
-loaded_json = open(temp.relpath("deploy_graph.json")).read()
 loaded_lib = tvm.runtime.load_module(path_lib)
-loaded_params = bytearray(open(temp.relpath("deploy_param.params"), "rb").read())
-input_data = tvm.nd.array(np.random.uniform(size=data_shape).astype("float32"))
+input_data = tvm.nd.array(data)
 
-module = graph_runtime.create(loaded_json, loaded_lib, ctx)
-module.load_params(loaded_params)
+module = graph_executor.GraphModule(loaded_lib["default"](dev))
 module.run(data=input_data)
 out_deploy = module.get_output(0).asnumpy()
 
@@ -157,4 +152,4 @@ out_deploy = module.get_output(0).asnumpy()
 print(out_deploy.flatten()[0:10])
 
 # check whether the output from deployed module is consistent with original one
-tvm.testing.assert_allclose(out_deploy, out, atol=1e-3)
+tvm.testing.assert_allclose(out_deploy, out, atol=1e-5)

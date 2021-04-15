@@ -1,4 +1,5 @@
 #!/bin/bash
+#set -x
 #
 # RUN TVM ROCm code generation unit test
 #
@@ -14,7 +15,4 @@ python3 test_target_codegen_bool.py
 python3 test_target_codegen_rocm.py
 python3 test_target_codegen_device.py
 python3 test_target_target.py
-# expected output: "Testing using contexts: [cpu(0),rocm(0)]
-python3 test_runtime_ndarray.py
-# expected output: "Running on target: rocm", along with no errors
 python3 test_te_tensor_overload.py
