@@ -36,8 +36,8 @@ echo "RUN apt update && apt install -y python python-dev python-setuptools gcc l
 read -p "Copy LLVM to docker? [Y]: " copy_llvm
 copy_llvm=${copy_llvm:="Y"}
 if [ "${copy_llvm}" == 'Y' -o "${copy_llvm}" == 'y' ]; then
-    env LLVMBUILD="llvmbuild10" ./build_llvm9.sh
-    echo "COPY llvmbuild10/install/ /usr/local/llvm/" >> ${DOCKERFILE}
+    env LLVMBUILD="llvmbuild12" ./build_llvm9.sh
+    echo "COPY llvmbuild12/install/ /usr/local/llvm/" >> ${DOCKERFILE}
 else
    echo "RUN cd /src && git clone https://github.com/llvm/llvm-project.git" >> ${DOCKERFILE}
    echo "RUN cd /src/llvm-project && mkdir build" >> ${DOCKERFILE}
