@@ -3,7 +3,7 @@ RUN sed -e 's/debian/4.2/g' /etc/apt/sources.list.d/rocm.list > /etc/apt/sources
 RUN rm /etc/apt/sources.list.d/rocm.list
 ENV PATH=/usr/local/llvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-dev
+RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-dev libtinfo-dev
 RUN apt install -y python3.8 && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
 RUN mkdir /src && cd /src && wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && tar xf cmake-3.17.3.tar.gz && cd cmake-3.17.3 && ./configure && make && make install
 RUN apt update && apt install -y rocm-libs miopen-hip
