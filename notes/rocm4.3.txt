@@ -1,0 +1,16 @@
+Notes for building with ROCm 4.3
+--------------------------------
+1. When building with llvmorg-12.0.0 version of llvm-project, encountered
+   problems because ROCm runtime was looking to load llvm13git versions of
+   bitcode files and compiler was too old.
+
+2. Was able to build with tip of llvm-project if I passed in the flag:
+   -Wno-deprecated-declarations, as well as made sure fixes for PR #8682 were
+   present.
+
+3. Also tried building with the /opt/rocm/llvm/bin/llvm-config version of the
+   compiler.  This encountered some issues because AMD ROCm compiler was
+   forked before PR #7617 was merged, changing CreateAtomicRMW calls.
+   Worked around this by backing these off in sources at:
+   http://github.com/mvermeulen/tvm in branch rocm-4.3-test.
+
