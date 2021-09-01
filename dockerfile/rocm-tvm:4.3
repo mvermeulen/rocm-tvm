@@ -17,4 +17,5 @@ RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
 RUN pip3 install scipy psutil xgboost tornado pytest
 RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils
 RUN export CMAKE_ARGS=-DONNX_USE_PROTOBUF_SHARED_LIBS=ON
+RUN pip3 install --upgrade pip
 RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz onnx pillow
