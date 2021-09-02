@@ -26,9 +26,9 @@ tvmc tune --target "rocm" --output resnet50i1-autotuner.json ${SAVED_MODELDIR}/t
 tvmc compile --target "rocm" --tuning-records resnet50i1-autotuner.json --output resnet50i1-tuned.tar ${SAVED_MODELDIR}/torchvision/resnet50i1.onnx
 
 # Run the compiled model
-tvmc -v run --device run --inputs imagenet_cat.npz --output predictions.npz resnet50i1-tuned.tar
+tvmc -v run --device "rocm" run --inputs imagenet_cat.npz --output predictions.npz resnet50i1-tuned.tar
 python3 postprocess.py
 
 # Try tuning comparisons
-tvmc run --device run --inputs imagenet_cat.npz --output predictions.npz --print-time --repeat 1000 resnet50i1.tar 
-tvmc run --device run --inputs imagenet_cat.npz --output predictions.npz --print-time --repeat 1000 resnet50i1-tuned.tar 
+tvmc run --device run "rocm" --inputs imagenet_cat.npz --output predictions.npz --print-time --repeat 1000 resnet50i1.tar 
+tvmc run --device run "rocm" --inputs imagenet_cat.npz --output predictions.npz --print-time --repeat 1000 resnet50i1-tuned.tar 
