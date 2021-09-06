@@ -8,7 +8,7 @@ if [ ! -d tunedb_gpu ]; then
 fi
 
 if [ ! -d tunedb_cpu ]; then
-    mkir tunedb_cpu
+    mkdir tunedb_cpu
 fi
 
 if [ ! -d compiledb_gpu ]; then
@@ -33,6 +33,10 @@ fi
 
 if [ ! -d rundb_cpu ]; then
     mkdir rundb_cpu
+fi
+
+if [ ! -d log ]; then
+    mkdir log
 fi
 
 while read model path
@@ -62,11 +66,11 @@ do
     tunedb_cpu_autoscheduler=tunedb_cpu/${model}.autosheduler.json
     if [ ! -f $tunedb_cpu_autotvm ]; then
 	echo "Tuning $tunedb_cpu_autotvm ---" | tee -a $logfile
-	tvmc -v tune --target "rocm" --output $tunedb_cpu_autotvm $onnxfile 2>&1 | tee -a $logfile	
+	tvmc -v tune --target "llvm" --output $tunedb_cpu_autotvm $onnxfile 2>&1 | tee -a $logfile	
     fi
     if [ ! -f $tunedb_cpu_autoscheduler ]; then
 	echo "Tuning $tunedb_cpu_autoscheduler ---" | tee -a $logfile
-	tvmc -v tune --target "rocm" --output $tunedb_cpu_autoscheduler --enable-autoscheduler $onnxfile 2>&1 | tee -a $logfile		
+	tvmc -v tune --target "llvm" --output $tunedb_cpu_autoscheduler --enable-autoscheduler $onnxfile 2>&1 | tee -a $logfile		
     fi
 
     # compile for the GPU
