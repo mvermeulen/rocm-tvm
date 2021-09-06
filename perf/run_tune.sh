@@ -116,15 +116,15 @@ do
 
     if [ ! -f $profiledb_gpu_untuned ]; then
 	echo "Profiling $profiledb_gpu_untuned --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_untuned > $profiledb_gpu_untuned
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_untuned > $profiledb_gpu_untuned
     fi
     if [ ! -f $profiledb_gpu_autotvm ]; then
 	echo "Profiling $profiledb_gpu_autotvm --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autotvm > $profiledb_gpu_autotvm
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autotvm > $profiledb_gpu_autotvm
     fi
     if [ ! -f $profiledb_gpu_autoscheduler ]; then
 	echo "Profiling $profiledb_gpu_autoscheduler --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autoscheduler > $profiledb_gpu_autoscheduler
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autoscheduler > $profiledb_gpu_autoscheduler
     fi
 
     # gather profile information for CPU
@@ -134,15 +134,15 @@ do
 
     if [ ! -f $profiledb_cpu_untuned ]; then
 	echo "Profiling $profiledb_cpu_untuned --" | tee -a $logfile
-	tvmc -v run -device "cpu" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_untuned > $profiledb_cpu_untuned
+	tvmc -v run --device "cpu" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_untuned > $profiledb_cpu_untuned
     fi
     if [ ! -f $profiledb_cpu_autotvm ]; then
 	echo "Profiling $profiledb_cpu_autotvm --" | tee -a $logfile
-	tvmc -v run -device "cpu" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autotvm > $profiledb_cpu_autotvm
+	tvmc -v run --device "cpu" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autotvm > $profiledb_cpu_autotvm
     fi
     if [ ! -f $profiledb_cpu_autoscheduler ]; then
 	echo "Profiling $profiledb_cpu_autoscheduler --" | tee -a $logfile
-	tvmc -v run -device "cpu" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autoscheduler > $profiledb_cpu_autoscheduler
+	tvmc -v run --device "cpu" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autoscheduler > $profiledb_cpu_autoscheduler
     fi
 
     # run the GPU models
@@ -152,15 +152,15 @@ do
 
     if [ ! -f $rundb_gpu_untuned ]; then
 	echo "Profiling $profile_gpu_untuned --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_untuned > $rundb_gpu_untuned
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_untuned > $rundb_gpu_untuned
     fi
     if [ ! -f $rundb_gpu_autotvm ]; then
 	echo "Profiling $rundb_gpu_autotvm --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autotvm > $rundb_gpu_autotvm
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autotvm > $rundb_gpu_autotvm
     fi
     if [ ! -f $rundb_gpu_autoscheduler ]; then
 	echo "Profiling $rundb_gpu_autoscheduler --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autoscheduler > $rundb_gpu_autoscheduler
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_gpu_autoscheduler > $rundb_gpu_autoscheduler
     fi
 
     # run the CPU models
@@ -170,15 +170,15 @@ do
 
     if [ ! -f $rundb_cpu_untuned ]; then
 	echo "Profiling $profile_cpu_untuned --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_untuned > $rundb_cpu_untuned
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_untuned > $rundb_cpu_untuned
     fi
     if [ ! -f $rundb_cpu_autotvm ]; then
 	echo "Profiling $rundb_cpu_autotvm --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autotvm > $rundb_cpu_autotvm
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autotvm > $rundb_cpu_autotvm
     fi
     if [ ! -f $rundb_cpu_autoscheduler ]; then
 	echo "Profiling $rundb_cpu_autoscheduler --" | tee -a $logfile
-	tvmc -v run -device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autoscheduler > $rundb_cpu_autoscheduler
+	tvmc -v run --device "rocm" --profile --file-mode random --print-time --repeat 100 $compiledb_cpu_autoscheduler > $rundb_cpu_autoscheduler
     fi    
     
 done <<MODELLIST
