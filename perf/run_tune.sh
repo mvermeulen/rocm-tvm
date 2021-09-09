@@ -182,6 +182,7 @@ do
     fi    
     
 done <<MODELLIST
+torchvision-resnet18i1	torchvision/resnet18i1.onnx
 torchvision-resnet50i1  torchvision/resnet50i1.onnx
 torchvision-inceptioni1 torchvision/inceptioni1.onnx
 torchvision-vgg16       torchvision/vgg16i1.onnx
