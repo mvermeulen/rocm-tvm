@@ -177,8 +177,8 @@ print(
 print("Equivalent python schedule:")
 print(task.print_best(log_file, print_mode="schedule"))
 
-print("LLVM source code:")
-print(task.print_best(log_file, print_mode="llvm"))
+#print("LLVM source code:")
+#print(task.print_best(log_file, print_mode="llvm"))
 
 ######################################################################
 # A more complicated example is to resume the search.
