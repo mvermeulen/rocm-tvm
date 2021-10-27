@@ -14,8 +14,11 @@ do
 	continue
     fi
     compilefile=${tag}.tar
+    compilefilelibs=${tag}.libs.tar
     tvmc -v compile --target rocm --output $compilefile ${SAVED_MODELS}/$savefile 1>$tag.compile.out 2>$tag.compile.err
+    tvmc -v compile --target "rocm -libs=miopen,rocblas" --output $compilefilelibs ${SAVED_MODELS}/$savefile 1>$tag.compile.libs.out 2>$tag.compile.libs.err    
     tvmc -v run --device rocm --fill-mode random --print-time --repeat 100 $compilefile 1>$tag.run.out 2>$tag.run.err
+    tvmc -v run --device rocm --fill-mode random --print-time --repeat 100 $compilefilelibs 1>$tag.run.libs.out 2>$tag.run.libs.err    
     runtime=`head -3 $tag.run.out | tail -n 1 | awk '{ print $1 }'`
     echo $tag,$runtime
     echo $tag,$runtime | tee -a results.csv
@@ -28,5 +31,6 @@ cadene-resnext101_1            1 cadene/resnext101_64x4di1.onnx
 slim-vgg16_1                   1 slim/vgg16_i1.pb
 slim-mobilenet_1               1 slim/mobilenet_i1.pb
 slim-inceptionv4_1             1 slim/inceptionv4_i1.pb
+bert-mrpc1		       1 huggingface-transformers/bert_mrpc1.onnx
 MODELLIST
 
