@@ -20,8 +20,9 @@ do
     tvmc -v run --device rocm --fill-mode random --print-time --repeat 100 $compilefile 1>$tag.run.out 2>$tag.run.err
     tvmc -v run --device rocm --fill-mode random --print-time --repeat 100 $compilefilelibs 1>$tag.run.libs.out 2>$tag.run.libs.err    
     runtime=`head -3 $tag.run.out | tail -n 1 | awk '{ print $1 }'`
-    echo $tag,$runtime
+    runtimelibs=`head -3 $tag.run.libs.out | tail -n 1 | awk '{ print $1 }'`    
     echo $tag,$runtime | tee -a results.csv
+    echo $tag,$runtimelibs | tee -a results.libs.csv
 done <<MODELLIST
 torchvision-resnet50_1         1 torchvision/resnet50i1.onnx
 torchvision-inceptionv3_1      1 torchvision/inceptioni1.onnx
