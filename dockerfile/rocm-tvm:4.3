@@ -19,3 +19,4 @@ RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciuti
 RUN export CMAKE_ARGS=-DONNX_USE_PROTOBUF_SHARED_LIBS=ON
 RUN pip3 install --upgrade pip
 RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz onnx pillow
+RUN pip3 install tensorflow-rocm
