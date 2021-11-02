@@ -12,6 +12,7 @@ RUN cd /src && git clone --recursive https://github.com/mvermeulen/tvm && cd tvm
 RUN mkdir /src/tvm/build
 RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /opt/rocm/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
 RUN cd /src/tvm/build && cmake -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" .. && make
+RUN pip3 install setuptools
 RUN cd /src/tvm/python && python3 setup.py install
 RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
 RUN pip3 install scipy psutil xgboost tornado pytest
