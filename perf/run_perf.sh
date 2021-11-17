@@ -7,7 +7,9 @@ cd ${TEST_RESULTDIR}
 testdir=tvm-`date '+%Y-%m-%d-%H-%M'`
 mkdir $testdir
 cd $testdir
-
+pushd /src/tvm
+git log | head -5 > $testdir/commit.txt
+popd
 while read tag batch savefile extra
 do
     if [ "$tag" == "#" ]; then
