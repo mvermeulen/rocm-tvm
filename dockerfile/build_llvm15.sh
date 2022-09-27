@@ -29,7 +29,7 @@ fi
 if [ ! -d build ]; then
     mkdir build
     cd build
-    cmake -G "Unix Makefiles" -DLLVM_ENABLE_PROJECTS="lld;compiler-rt;clang" -DLLVM_TARGETS_TO_BUILD="X86;AMDGPU" -DCMAKE_INSTALL_PREFIX=../../install ../llvm
+    cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_ENABLE_PROJECTS="lld;compiler-rt;clang" -DLLVM_TARGETS_TO_BUILD="X86;AMDGPU" -DCMAKE_INSTALL_PREFIX=../../install ../llvm
 else
     cd build
 fi
