@@ -1,0 +1,25 @@
+FROM rocm/dev-ubuntu-20.04:5.2.3
+RUN sed -e 's/debian/5.2.3/g' /etc/apt/sources.list.d/rocm.list > /etc/apt/sources.list.d/rocm5.2.list
+RUN rm /etc/apt/sources.list.d/rocm.list
+ENV PATH=/opt/rocm/llvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-dev libtinfo-dev libprotobuf-dev protobuf-compiler
+RUN mkdir /src && cd /src && wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && tar xf cmake-3.17.3.tar.gz && cd cmake-3.17.3 && ./configure && make && make install
+RUN apt update && apt install -y rocm-libs miopen-hip
+RUN apt update && apt install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip python3-setuptools python3-numpy
+# a34731 - ok
+# c2eb51 - not ok
+RUN cd /src && git clone --recursive https://github.com/mvermeulen/tvm && cd tvm && git checkout rocm-5.2-test
+RUN mkdir /src/tvm/build
+RUN cd /src/tvm/build && sed -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /opt/rocm/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
+RUN cd /src/tvm/build && cmake -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" .. && make
+#RUN pip3 install os-sys
+RUN pip3 install -U numpy
+RUN cd /src/tvm/python && python3 setup.py install
+RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
+RUN pip3 install scipy psutil xgboost tornado pytest
+RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils
+RUN export CMAKE_ARGS=-DONNX_USE_PROTOBUF_SHARED_LIBS=ON
+RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz onnx pillow
+RUN pip3 install tensorflow
+WORKSPACE /src/rocm-tvm
