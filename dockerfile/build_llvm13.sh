@@ -2,7 +2,7 @@
 #
 # Build LLVM locally rather than in the docker image.
 
-LLVMBUILD=${LLVMBUILD:="llvmbuild12"}
+LLVMBUILD=${LLVMBUILD:="llvmbuild13"}
 # needs to be local so it can be copied in...
 LLVMINSTALL=${LLVMINSTALL:="${LLVMBUILD}/install"}
 LLVMSRC=${LLVSRC:="${LLVMBUILD}/llvm-project"}
