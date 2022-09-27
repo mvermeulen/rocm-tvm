@@ -21,7 +21,7 @@ if [ -d ${LLVMBUILD}/llvm-project ]; then
     git pull
 else
     cd ${LLVMBUILD}
-    git clone https://github.com/llvm/llvm-project.git
+    git clone --depth 1 https://github.com/llvm/llvm-project.git
     cd llvm-project
     git checkout llvmorg-15.0.0
 fi
