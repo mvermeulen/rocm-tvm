@@ -1,23 +1,25 @@
 import tvm
+from tvm import te
+import tvm.testing
 import numpy as np
 
 # Matrix add 
-n = tvm.var('n')
-m = tvm.var('m')
-A = tvm.placeholder((m,n), name='A')
-B = tvm.placeholder((m,n), name='B')
-C = tvm.compute((m,n), lambda i,j: A[i,j] + B[i,j], name='C')
+n = te.var('n')
+m = te.var('m')
+A = te.placeholder((m,n), name='A')
+B = te.placeholder((m,n), name='B')
+C = te.compute((m,n), lambda i,j: A[i,j] + B[i,j], name='C')
 
 # Create default schedule
-s = tvm.create_schedule(C.op)
+s = te.create_schedule(C.op)
 
 # Example low level IR
 print(tvm.lower(s, [A, B, C], simple_mode=True))
 
 # Compile for GPU target
 # GPU thread indices
-block_x = tvm.thread_axis('blockIdx.x')
-thread_x = tvm.thread_axis('threadIdx.x')
+block_x = te.thread_axis('blockIdx.x')
+thread_x = te.thread_axis('threadIdx.x')
 
 # split the workload
 bx,tx = s[C].split(C.op.axis[0],factor=64)
