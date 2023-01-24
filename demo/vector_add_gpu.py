@@ -27,7 +27,8 @@ s[C].bind(bx,block_x)
 s[C].bind(tx,thread_x)
 
 target='rocm'
-vadd_gpu =  tvm.build(s, [A,B,C], target, target_host='llvm', name='vadd_gpu')
+target = tvm.target.Target("rocm", host="llvm")
+vadd_gpu =  tvm.build(s, [A,B,C], target=target, name='vadd_gpu')
 
 # Run the function in GPU context
 ctx = tvm.rocm(0)
@@ -39,6 +40,6 @@ vadd_gpu(a,b,c)
 tvm.testing.assert_allclose(c.asnumpy(), a.asnumpy() + b.asnumpy())
 
 dev_module = vadd_gpu.imported_modules[0]
-print(dev_module.get_source('llvm'))
-print(dev_module.get_source('asm'))
+#print(dev_module.get_source('llvm'))
+#print(dev_module.get_source('asm'))
 
