@@ -15,11 +15,6 @@ class SmallModel(torch.nn.Module):
 
 smallmodel = SmallModel()
 
-print('Model: ',smallmodel)
-print('Params: ')
-for param in smallmodel.parameters():
-    print(param)
-
 torch.onnx.export(smallmodel,
                   (torch.randn(10),torch.randn(10)),
                   'vector_add.onnx',
