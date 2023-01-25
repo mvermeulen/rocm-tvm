@@ -21,3 +21,9 @@ torch.onnx.export(smallmodel,
                   input_names = ['input1','input2'],
                   output_names = ['output'])
                   
+torch.onnx.export(smallmodel,
+                  (torch.randn(10,dtype=torch.float16),
+                   torch.randn(10,dtype=torch.float16)),
+                  'vector_add_fp16.onnx',
+                  input_names = ['input1','input2'],
+                  output_names = ['output'])
