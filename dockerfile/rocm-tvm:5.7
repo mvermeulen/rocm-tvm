@@ -6,14 +6,20 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y git wget libz3-dev libxml2-dev openssl libssl-dev libtinfo-dev libprotobuf-dev protobuf-compiler
 RUN apt update && apt install -y rocm-libs miopen-hip
 RUN apt update && apt install -y python3-dev python-setuptools gcc libtinfo-dev zlib1g-dev build-essential python3 python3-pip python3-setuptools python3-numpy cmake
-RUN mkdir /src && cd /src && git clone --recursive https://github.com/mvermeulen/tvm
-#RUN mkdir /src && cd /src && git clone --recursive https://github.com/mvermeulen/tvm && cd tvm && git checkout rocm-5.7-test
+
+# PR #14901 seems to have introduced problem with ROCm codegen, use #53cee4 temporarily to work around this...
+RUN mkdir /src && cd /src && git clone --recursive https://github.com/mvermeulen/tvm && cd tvm && git checkout 53cee4
+
 RUN mkdir /src/tvm/build
 RUN cd /src/tvm/build && sed -e 's/USE_RELAY_DEBUG OFF/USE_RELAY_DEBUG ON/g' -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /opt/rocm/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
 #RUN cd /src/tvm/build && cmake -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" .. && make
 RUN cd /src/tvm/build && cmake .. && make
 #RUN pip3 install os-sys
 RUN pip3 install -U numpy
+RUN pip3 list | grep numpy
+# temporary hack to fix numpy build issue (this was fixed in v0.14, likely #b4b27f
+RUN sed -i -e 's/"<=1.23"/None/g' /src/tvm/python/gen_requirements.py
+#
 RUN cd /src/tvm/python && python3 setup.py install
 RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
 RUN pip3 install scipy psutil xgboost tornado pytest
