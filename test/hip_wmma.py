@@ -1,12 +1,22 @@
 # Test for wmma GEMM using hip backend
 # Derived from unit tests.
+
+# Both this file and unit tests core dump with an invalid pointer
 #
+import numpy as np
+
 import tvm
 from tvm import te
+from tvm import meta_schedule as ms
+from tvm._ffi import register_func
+from tvm.meta_schedule.builder import LocalBuilder
 from tvm.target import Target
 
+# get tensor intrin
+from tvm.tir.tensor_intrin import rocm
+
 # generate schedule for matrix multiply
-def matmul_fp16(M:int, K:int, in_type: str, out_dtype:str):
+def matmul_fp16(M:int, N:int, K:int, in_dtype: str, out_dtype:str):
     x = te.placeholder((M,K), name="X", dtype=in_dtype)
     y = te.placeholder((K,N), name="Y", dtype=in_dtype)
     k = te.reduce_axis((0,K), name="k")
@@ -53,7 +63,7 @@ def test_wmma_tune(tune_idx):
 
         mod = tvm.IRModule({"main": func})
         work_dir = "./matrix_core_text"
-        db = ms.tir.integration.tune_tir(
+        db = ms.tir_integration.tune_tir(
             mod = mod,
             target=target,
             work_dir=work_dir,
@@ -78,7 +88,7 @@ def test_wmma_tune(tune_idx):
             golden = np.matmul(a_np.astype(in_dtype), b_np.astype(in_dtype))
             tvm.testing.assert_allclose(golden, c_tvm.numpy(), atol=1e-3, rtol=1e-3)
 
-    tune("float32", "float32")
+    tune("float16", "float32")
 
 if __name__ == "__main__":
     for tune_idx in range(0,6):
