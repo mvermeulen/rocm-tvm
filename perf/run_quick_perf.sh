@@ -1,36 +1,45 @@
 #!/bin/bash
-set -x
 
 MODEL=${MODEL:="/home/mev/source/rocm-migraphx/saved-models/torchvision/resnet50i1.onnx"}
-
 model_name=`basename $MODEL .onnx`
-echo "Model:" $model_name
 
-tvmc compile --target llvm -o ${model_name}.cpu.tar $MODEL \
-     1> ${model_name}.cpu.compile.out 2> ${model_name}.cpu.compile.err
-tvmc run --device cpu --fill-mode random --print-time --repeat 100 ${model_name}.cpu.tar \
-     1> ${model_name}.cpu.run.out 2> ${model_name}.cpu.run.err
+models=(
+    '/home/mev/source/rocm-migraphx/saved-models/torchvision/resnet50i1.onnx'
+    '/home/mev/source/rocm-migraphx/saved-models/onnx-model-zoo/gpt2-10.onnx'
+)
+labels=('cpu' 'rocm' 'hip')
+targets=('llvm' 'rocm' 'hip')
+devices=('cpu' 'rocm' 'rocm')
 
-tvmc compile --target rocm -o ${model_name}.rocm.tar $MODEL \
-     1> ${model_name}.rocm.compile.out 2> ${model_name}.rocm.compile.err
-tvmc run --device rocm --fill-mode random --print-time --repeat 100 ${model_name}.rocm.tar \
-     1> ${model_name}.rocm.run.out 2> ${model_name}.rocm.run.err
-
-tvmc compile --target hip -o ${model_name}.hip.tar $MODEL \
-     1> ${model_name}.hip.compile.out 2> ${model_name}.hip.compile.err
-tvmc run --device rocm --fill-mode random --print-time --repeat 100 ${model_name}.hip.tar \
-     1> ${model_name}.hip.run.out 2> ${model_name}.hip.run.err
-
-tvmc tune --target llvm --output ${model_name}.cpu.tunerecords.json $MODEL \
-     1> ${model_name}.cpu.tune.out 2> ${model_name}.cpu.tune.err
-tvmc compile --target llvm -o ${model_name}.cputuned.tar $MODEL --tuning-records ${model_name}.cpu.tunerecords.json \
-     1> ${model_name}.cpu.compiletuned.out 2> ${model_name}.cpu.compiletuned.err
-tvmc run --device cpu --fill-mode random --print-time --repeat 100 ${model_name}.cputuned.tar \
-     1> ${model_name}.cpu.runtuned.out 2> ${model_name}.cpu.runtuned.err
-
-tvmc tune --target hip --output ${model_name}.hip.tunerecords.json $MODEL \
-     1> ${model_name}.hip.tune.out 2> ${model_name}.hip.tune.err
-tvmc compile --target hip -o ${model_name}.hiptuned.tar $MODEL --tuning-records ${model_name}.hip.tunerecords.json \
-     1> ${model_name}.hip.compiletuned.out 2> ${model_name}.hip.compiletuned.err
-tvmc run --device rocm --fill-mode random --print-time --repeat 100 ${model_name}.hiptuned.tar \
-     1> ${model_name}.hip.runtuned.out 2> ${model_name}.hip.runtuned.err
+for full_model in ${models[*]}
+do
+    model=`basename $full_model .onnx`
+    for i in "${!targets[@]}"
+    do
+	label=${labels[$i]}
+	target=${targets[$i]}
+	device=${devices[$i]}
+	
+	echo "\n--- Model: $model,  Device: $device, Target: $target"
+	
+	echo tvmc compile --target $target -o ${model}.${target}.tar $full_model
+	tvmc compile --target $target -o ${model}.${target}.tar $full_model \
+	     1> ${model}.${label}.compile.out 2> ${model}.${label}.compile.err
+	
+	echo tvmc run --device $device --fill-mode random --print-time --repeat 100 ${model}.${target}.tar
+	tvmc run --device $device --fill-mode random --print-time --repeat 100 ${model}.${target}.tar \
+	     1> ${model}.${label}.run.out 2> ${model}.${label}.run.err
+	
+	echo tvmc tune --target $target --output ${model}.${target}.json $full_model
+	tvmc tune --target $target --output ${model}.${target}.json $full_model \
+	     1> ${model}.${label}.tune.out 2>${model}.${label}.tune.err
+	
+	echo tvmc compile --target $target -o ${model}.${target}.tuned.tar --tuning-records ${model}.${target}.json $full_model
+	tvmc compile --target $target -o ${model}.${target}.tuned.tar --tuning-records ${model}.${target}.json $full_model \
+	     1> ${model}.${label}.compilet.out 2> ${model}.${label}.compilet.err
+	
+	echo tvmc run --device $device --fill-mode random --print-time --repeat 100 ${model}.${target}.tuned.tar
+	tvmc run --device $device --fill-mode random --print-time --repeat 100 ${model}.${target}.tuned.tar \
+	     1> ${model}.${label}.runt.out 2> ${model}.${label}.runt.err
+    done    
+done
