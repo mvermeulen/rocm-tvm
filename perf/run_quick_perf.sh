@@ -5,7 +5,10 @@ model_name=`basename $MODEL .onnx`
 
 models=(
     '/home/mev/source/rocm-migraphx/saved-models/torchvision/resnet50i1.onnx'
+    '/home/mev/source/rocm-migraphx/saved-models/torchvision/resnet50i64.onnx'
     '/home/mev/source/rocm-migraphx/saved-models/onnx-model-zoo/gpt2-10.onnx'
+    '/home/mev/source/rocm-migraphx/saved-models/onnx-model-zoo/inception-v2-9.onnx'
+    '/home/mev/source/rocm-migraphx/saved-models/onnx-model-zoo/bertsquad-12.onnx'
 )
 labels=('cpu' 'rocm' 'hip')
 targets=('llvm' 'rocm' 'hip')
