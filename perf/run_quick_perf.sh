@@ -9,7 +9,7 @@ models=(
     '/home/mev/source/rocm-migraphx/saved-models/onnx-model-zoo/inception-v2-9.onnx'
 )
 labels=('cpu' 'rocm' 'hip' 'rocmlib')
-targets=('llvm' 'rocm' 'hip' 'rocm -libs=miopen,rocblas)
+targets=('llvm' 'rocm' 'hip' 'rocm -libs=miopen,rocblas')
 devices=('cpu' 'rocm' 'rocm' 'rocm')
 
 for full_model in ${models[*]}
