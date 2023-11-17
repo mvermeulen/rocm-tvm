@@ -13,7 +13,7 @@ RUN apt install -y ./`basename ${install_script}`
 RUN amdgpu-install --vulkan=pro --usecase=rocmdev,graphics,mlsdk --accept-eula --no-dkms
 
 RUN mkdir /src && cd /src && git clone --recursive https://github.com/mvermeulen/tvm && cd tvm && git checkout rocm5.7-test
-RUN mkdir /src/tvm/build && cd /src/tvm/build && sed -e 's/USE_RELAY_DEBUG_OFF/USE_RELAY_DEBUG_ON/g' -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM_OFF?USE_LLVM /opt/rocm/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN_OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
+RUN mkdir /src/tvm/build && cd /src/tvm/build && sed -e 's/USE_RELAY_DEBUG OFF/USE_RELAY_DEBUG ON/g' -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /opt/rocm/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' ../cmake/config.cmake > config.cmake
 RUN cd /src/tvm/build && cmake .. && make -j ${parallel}
 RUN pip3 install -U numpy
 RUN cd /src/tvm/python && python3 setup.py install
