@@ -4,7 +4,7 @@ FROM ${cu_docker}
 ARG parallel=1
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y git
+RUN apt update && apt install -y git cmake
 
 RUN mkdir /src && cd /src && git clone --recursive https://github.com/apache/tvm
 RUN mkdir /src/tvm/build
