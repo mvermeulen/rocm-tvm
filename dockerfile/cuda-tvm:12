@@ -1,0 +1,16 @@
+# Dockerfile for CUDA based TVM
+ARG cu_docker=nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
+FROM ${cu_docker}
+ARG parallel=1
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y git
+
+RUN mkdir /src && cd /src && git clone --recursive https://github.com/apache/tvm
+RUN mkdir /src/tvm/build
+RUN cd /src/tvm/build && sed -e 's/USE_CUDA OFF/USE_CUDA ON/g' \
+    -e 's/USE_CUDNN OFF/USE_CUDNN ON/g' \
+    -e 's/USE_CUBLAS OFF/USE_CUBLAS ON/g' \
+    ../cmake/config.cmake > config.cmake
+RUN cd /src/tvm/build && cmake .. && make -j ${parallel}
+RUN cd /src/tvm/python && python3 setup.py install
