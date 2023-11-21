@@ -13,4 +13,5 @@ RUN cd /src/tvm/build && sed -e 's/USE_CUDA OFF/USE_CUDA ON/g' \
     -e 's/USE_CUBLAS OFF/USE_CUBLAS ON/g' \
     ../cmake/config.cmake > config.cmake
 RUN cd /src/tvm/build && cmake .. && make -j ${parallel}
+RUN pip3 install -U numpy
 RUN cd /src/tvm/python && python3 setup.py install
