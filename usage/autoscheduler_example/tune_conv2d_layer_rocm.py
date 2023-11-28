@@ -101,7 +101,7 @@ print(task.compute_dag)
 log_file = "conv2d.json"
 measure_ctx = auto_scheduler.LocalRPCMeasureContext(min_repeat_ms=300)
 tune_option = auto_scheduler.TuningOptions(
-    num_measure_trials=10,  # change this to 1000 to achieve the best performance
+    num_measure_trials=1000,  # change this to 1000 to achieve the best performance
     runner=measure_ctx.runner,
     measure_callbacks=[auto_scheduler.RecordToFile(log_file)],
     verbose=2,
