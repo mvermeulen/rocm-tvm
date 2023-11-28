@@ -10,9 +10,9 @@ models=(
     '/home/mev/source/rocm-migraphx/saved-models/torchvision/resnet50i64.onnx'
     '/home/mev/source/rocm-migraphx/saved-models/onnx-model-zoo/inception-v2-9.onnx'
 )
-labels=('cpu' 'rocm' 'hip' 'rocmlib' 'nvptx' 'cuda' 'nvptxlib' 'cudalib')
-targets=('llvm' 'rocm' 'hip' 'rocm -libs=miopen,rocblas' 'nvptx' 'cuda' 'nvptx -libs=cudnn,cublas' 'cuda -libs=cudnn,cublas')
-devices=('cpu' 'rocm' 'rocm' 'rocm' 'cuda' 'cuda' 'cuda' 'cuda')
+labels=('cpu' 'rocm' 'hip' 'rocmlib' 'nvptx' 'cuda' 'nvptxlib' 'cudalib' 'vulkan')
+targets=('llvm' 'rocm' 'hip' 'rocm -libs=miopen,rocblas' 'nvptx' 'cuda' 'nvptx -libs=cudnn,cublas' 'cuda -libs=cudnn,cublas' 'vulkan')
+devices=('cpu' 'rocm' 'rocm' 'rocm' 'cuda' 'cuda' 'cuda' 'cuda' 'vulkan')
 
 for full_model in ${models[*]}
 do
