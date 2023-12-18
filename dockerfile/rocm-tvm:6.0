@@ -1,0 +1,32 @@
+# Build TVM on top of the amdgpu-install script
+#
+FROM ubuntu:22.04
+ARG install_script="https://repo.radeon.com/amdgpu-install/6.0/ubuntu/jammy/amdgpu-install_6.0.60000-1_all.deb"
+ARG parallel=1
+ENV PATH=/opt/rocm/llvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /workdir
+RUN echo "APT::Get::Assume-Yes \"true\";\n" >> /etc/apt/apt.conf.d/answer-yes
+
+RUN apt update && apt install -y wget git cmake build-essential python3 python3-pip python3-setuptools python3-numpy
+RUN wget ${install_script}
+RUN apt install -y ./`basename ${install_script}`
+RUN amdgpu-install --usecase=rocmdev,graphics,mlsdk --accept-eula --no-dkms
+
+RUN wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+RUN sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-jammy.list http://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list
+RUN sudo apt update
+#RUN sudo apt install vulkan-sdk
+
+RUN mkdir /src && cd /src && git clone --recursive https://github.com/mvermeulen/tvm && cd tvm && git checkout rocm5.7-test
+RUN mkdir /src/tvm/build && cd /src/tvm/build && sed -e 's/USE_RELAY_DEBUG OFF/USE_RELAY_DEBUG ON/g' -e 's/USE_ROCM OFF/USE_ROCM ON/g' -e 's?USE_LLVM OFF?USE_LLVM /opt/rocm/llvm/bin/llvm-config?g' -e 's/USE_MIOPEN OFF/USE_MIOPEN ON/g' -e 's/USE_ROCBLAS OFF/USE_ROCBLAS ON/g' -e 's?USE_VULKAN OFF?USE_VULKAN ON?g' ../cmake/config.cmake > config.cmake
+RUN cd /src/tvm/build && cmake .. && make -j ${parallel}
+RUN pip3 install -U numpy
+RUN cd /src/tvm/python && python3 setup.py install
+RUN cd /src && git clone https://github.com/mvermeulen/rocm-tvm
+RUN pip3 install scipy psutil xgboost tornado pytest
+RUN apt update && apt install -y libomp-dev graphviz rccl libopenblas-dev pciutils
+RUN export CMAKE_ARGS=-DONNX_USE_PROTOBUF_SHARED_LIBS=ON
+RUN pip3 install jupyter transformers antlr4-python3-runtime graphviz onnx pillow
+RUN pip3 install tensorflow
+WORKDIR /src/rocm-tvm
